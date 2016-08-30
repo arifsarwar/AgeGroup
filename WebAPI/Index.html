@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<body class="container">
+
+    <div ng-app="myApp" ng-controller="personsCtrl" class="col-md-8 left">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#home">Search</a></li>
+            <li><a data-toggle="tab" href="#menu1">Add New</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="home" class="tab-pane fade in active">
+                <div class="form-group">
+                    <label for="sel1">Search List:</label>
+                    <select class="form-control" ng-model="search.Opt" id="sel1" required>
+                        <option>First Name</option>
+                        <option>Last Name</option>
+                    </select>
+                </div>
+                <input type="text" name="FName" class="form-control" ng-model="search.charStr" title="Case Senstive"
+                       onmouseenter="$(this).tooltip('show')" required>
+                <button type="submit" class="btn btn-primary" ng-click="SearchData()">Search</button>
+
+
+            </div>
+            <div id="menu1" class="tab-pane fade">
+                <!-- FORM -->
+                <form name="userForm" ng-submit="submitForm()">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="FName" class="form-control" ng-model="user.FName" required>
+
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="LName" class="form-control" ng-model="user.LName" required>
+
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" name="Age" class="form-control" ng-model="user.Age" required>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+
+
+        <table class="table table-hover table-condensed">
+            <tr ng-repeat="Person in Persons">
+                <td>{{ Person.ID }}</td>
+                <td>{{ Person.FName }}</td>
+                <td>{{ Person.LName }}</td>
+                <td>{{ Person.AgeGroup }}</td>
+                <td>{{ Person.Age }}</td>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+    var app = angular.module('myApp', []);
+    app.controller('personsCtrl', function($scope, $http) {
+        //$http.get("http://localhost:27791/api/person/getallpersons/?Opt=none&val=none")
+        //        .then(function (response) {$scope.Persons = response.data;});
+        $scope.SearchData = function() {
+
+            var option = $scope.search.Opt;
+            console.log($scope.length);
+            $http({
+                method  : 'Get',
+                url     : 'http://localhost:27791/api/person/getallpersons?Opt=' + option + '&val=' + $scope.search.charStr
+            })
+                    .then(function(response) {
+
+                            //$scope.message = data.message;
+                            $scope.Persons = response.data;
+
+
+                    });
+        };
+        $scope.loadData = function() {
+            // Posting data to php file
+            $http({
+                method  : 'Get',
+                url     : 'http://localhost:27791/api/person/getallpersons?Opt=None&val=none'
+            })
+                    .then(function(response) {
+
+                        $scope.Persons = response.data;
+                    });
+        };
+        $scope.loadData();
+        // create a blank object to handle form data.
+        $scope.user = {};
+        // calling our submit function.
+        $scope.submitForm = function() {
+            // Posting data to php file
+            $http({
+                method  : 'POST',
+                url     : 'http://localhost:27791/api/person/PostPerson',
+                data    : $scope.user, //forms user object
+                headers : {'Content-Type': 'application/json'}
+            })
+                    .success(function(data) {
+                        if (data.errors) {
+                            // Showing errors.
+                            $scope.errorName = data.errors.name;
+                            $scope.errorUserName = data.errors.username;
+                            $scope.errorEmail = data.errors.email;
+                        } else {
+                            $scope.loadData();
+                            }
+                    });
+        };
+
+    });
+
+
+    </script>
+
+</body>
+</html>
+
