@@ -13,6 +13,9 @@ namespace DataAccess
     public class DAL : IDisposable
     {
 
+
+        
+
         private SQLiteConnection sql_con;
         private SQLiteCommand sql_cmd;
         private SQLiteDataAdapter DB;
