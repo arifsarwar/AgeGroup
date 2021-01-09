@@ -13,8 +13,8 @@ namespace DataAccess
     public class DAL : IDisposable
     {
 
+/* new comments added to the DAL*/
 
-        
 
         private SQLiteConnection sql_con;
         private SQLiteCommand sql_cmd;
